@@ -1,0 +1,73 @@
+{% include 'header.twig' %}
+
+<!-- Home page content -->
+    <div class="row" style="height: calc(100% - 88px);">
+        <!-- Map -->
+        <div id="mapid" class="col"></div>
+
+        <!-- Login form -->
+        <div class="col d-flex justify-content-center mt-5">
+            <!-- ... your login form here ... -->
+            <div class="col-md-6 custom-border p-5">
+                <form method="POST" action="/S401/login">
+                    <h2 class="mb-3">Login</h2>
+                    <div class="form-group mb-3">
+                        <label for="email">Email address</label>
+                        <input type="email" class="form-control" id="email" name="email" required />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary custom-button mt-4">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+.custom-button {
+	width: 80%;
+	font-size: 110%;
+}
+
+.custom-border {
+	border: 2px solid #495057;
+    border-radius: 10px;
+    height: 65%;
+}
+</style>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+// Get IP address
+fetch('https://api.bigdatacloud.net/data/client-ip')
+    .then(response => response.json())
+    .then(data => {
+        fetch(`https://api.apibundle.io/ip-lookup?apikey=d93c8ca6733a418c82fd3170b709a25a&ip=${data.ipString}`)
+            .then(response => response.json())
+            .then(data => {
+                // Use the location to set up the map
+                var map = L.map('mapid', {
+                    preferCanvas: true
+                }).setView([data.latitude, data.longitude], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+
+                L.marker([data.latitude, data.longitude]).addTo(map);
+            })
+            .catch(error => console.error('Error:', error));
+    })
+    .catch(error => console.error('Error:', error));
+</script>
+
+{% include 'footer.twig' %}

@@ -1,6 +1,8 @@
 RewriteEngine On
+
 RewriteRule ^$ public/ [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/$1
-FallbackResource /public/index.php
+
+# Customer products
+RewriteRule ^products$ /S401-site/public/index.php [L]
+
+FallbackResource /S401-site/public/index.php

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Ajouter une marque</title>
+	</head>
+	<body>
+		<form id="addBrandForm">
+			<label for="brandName">Nom de la marque :</label>
+			<input type="text" id="brandName" name="brandName" />
+			<input type="submit" value="Ajouter la marque" />
+		</form>
+
+		<script>
+			document
+				.getElementById("addBrandForm")
+				.addEventListener("submit", function (e) {
+					e.preventDefault();
+
+					var apiKey = window.prompt("Veuillez entrer votre clé d'accès :");
+					if (apiKey) {
+						var xhr = new XMLHttpRequest();
+						xhr.open(
+							"POST",
+							"https://dev-lefevre216.users.info.unicaen.fr/S401/brands/add",
+							true
+						);
+						xhr.setRequestHeader("Content-Type", "application/json");
+						xhr.setRequestHeader("Authorization", "Bearer " + apiKey);
+						xhr.onreadystatechange = function () {
+							if (xhr.readyState == 4 && xhr.status == 200) {
+								alert("Produit ajouté avec succès");
+							} else if (xhr.readyState == 4) {
+								alert("Erreur lors de l'ajout du produit");
+							}
+						};
+						// prettier-ignore
+						var data = JSON.stringify({
+							"brandName": document.getElementById("brandName").value,
+						});
+						xhr.send(data);
+					} else {
+						alert("Clé d'accès manquante");
+					}
+				});
+		</script>
+	</body>
+</html>
