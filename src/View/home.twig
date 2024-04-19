@@ -64,6 +64,34 @@ fetch('https://api.bigdatacloud.net/data/client-ip')
                 }).addTo(map);
 
                 L.marker([data.latitude, data.longitude]).addTo(map);
+
+                // Fetch store locations from your API
+                fetch('https://dev-lefevre216.users.info.unicaen.fr/S401/stores')
+                    .then(response => response.json())
+                    .then(stores => {
+                        // Create an array to hold the coordinates of all markers
+                        var bounds = [[data.latitude, data.longitude]]; // Add user's location to bounds
+                        
+                        // Geocode each store address and add a marker
+                        return Promise.all(stores.map(store => {
+                            return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(store.street + ', ' + store.zipcode)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data[0]) {
+                                        // Add the coordinates to the bounds array
+                                        bounds.push([data[0].lat, data[0].lon]);
+
+                                        L.marker([data[0].lat, data[0].lon]).addTo(map)
+                                            .bindPopup(`<b>${store.name}</b><br>${store.street}<br>${store.city}, ${store.state} ${store.zipcode}`);
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
+                        })).then(() => {
+                            // Adjust the map view to show all markers
+                            map.fitBounds(bounds);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
             })
             .catch(error => console.error('Error:', error));
     })
