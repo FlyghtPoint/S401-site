@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Model\ApiClient;
+use App\Controller\AuthController;
 
 class FrontController {
     private $apiClient;
@@ -13,11 +14,9 @@ class FrontController {
     }
 
     public function home() {
-        // if (password_verify($password, $user['password'])) {
-        //     setcookie('user', $email, time() + (86400 * 30), "/"); // 86400 = 1 day
-        // }
-
-        echo $this->twig->render('home.twig');
+        // Home page logic
+        $authController = new AuthController($this->apiClient, $this->twig);
+        echo $authController->redirectBasedOnStatus();
     }
 
     public function getProducts() {
@@ -40,7 +39,7 @@ class FrontController {
         $totalPages = ceil(count($products) / $productsPerPage);
 
         // Render the Twig template and pass the products and total pages as variables
-        echo $this->twig->render('products.twig', [
+        echo $this->twig->render('customer/products.twig', [
             'products' => $productsForCurrentPage,
             'totalPages' => $totalPages,
         ]);

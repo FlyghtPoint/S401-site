@@ -1,8 +1,13 @@
 RewriteEngine On
 
-RewriteRule ^$ public/ [L]
+# Home
+RewriteRule ^$ /S401-site/public/index.php [L]
 
 # Customer products
 RewriteRule ^products$ /S401-site/public/index.php [L]
 
-FallbackResource /S401-site/public/index.php
+# Login / Logout
+RewriteRule ^(login|logout)$ /S401-site/public/index.php [L]
+
+# Back office
+RewriteRule ^(employee|chief|it)/(brands|categories|employees|products|stocks|stores)$ /S401-site/public/index.php [L]

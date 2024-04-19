@@ -1,0 +1,104 @@
+{% include 'chief/header.twig' %}
+
+<!-- Home page content -->
+    <div class="row" style="height: calc(100% - 88px);">
+        <!-- Map -->
+        <div id="mapid" class="col"></div>
+
+        <!-- Login form -->
+        <div class="col d-flex justify-content-center mt-5">
+            <!-- ... your login form here ... -->
+            {# <div class="col-md-6 custom-border p-5"> #}
+                <div class="card mb-4 rounded-3 shadow-sm">
+                    {# <div class="card-header py-3"> #}
+                      {# <h4 class="my-0 fw-normal">Free</h4> #}
+                    {# </div> #}
+                    <div class="card-body">
+                        {# <h1 class="card-title pricing-card-title">$0<small class="text-body-secondary fw-light">/mo</small></h1> #}
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Hello {{ employee.employeeName }}! You are logged in as a {{ employee.employeeRole }}.</li>
+                        </ul>
+                        <button type="button" class="w-100 btn btn-lg btn-outline-primary">Logout</button>
+                    </div>
+                </div>
+            {# </div> #}
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+.custom-button {
+	width: 80%;
+	font-size: 110%;
+}
+
+.custom-border {
+	border: 2px solid #495057;
+    border-radius: 10px;
+    height: 65%;
+}
+</style>
+
+<!-- Leaflet JavaScript -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<!-- Custom JavaScript -->
+<script>
+// Get IP address
+fetch('https://api.bigdatacloud.net/data/client-ip')
+    .then(response => response.json())
+    .then(data => {
+        fetch(`https://api.apibundle.io/ip-lookup?apikey=d93c8ca6733a418c82fd3170b709a25a&ip=${data.ipString}`)
+            .then(response => response.json())
+            .then(data => {
+                // Use the location to set up the map
+                var map = L.map('mapid', {
+                    preferCanvas: true
+                }).setView([data.latitude, data.longitude], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+
+                L.marker([data.latitude, data.longitude]).addTo(map);
+
+                // Fetch store locations from your API
+                fetch('https://dev-lefevre216.users.info.unicaen.fr/S401/stores')
+                    .then(response => response.json())
+                    .then(stores => {
+                        // Create an array to hold the coordinates of all markers
+                        var bounds = [[data.latitude, data.longitude]]; // Add user's location to bounds
+                        
+                        // Geocode each store address and add a marker
+                        return Promise.all(stores.map(store => {
+                            return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(store.street + ', ' + store.zipcode)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data[0]) {
+                                        // Add the coordinates to the bounds array
+                                        bounds.push([data[0].lat, data[0].lon]);
+
+                                        L.marker([data[0].lat, data[0].lon]).addTo(map)
+                                            .bindPopup(`<b>${store.name}</b><br>${store.street}<br>${store.city}, ${store.state} ${store.zipcode}`);
+                                    }
+                                })
+                                .catch(error => console.error('Error:', error));
+                        })).then(() => {
+                            // Adjust the map view to show all markers
+                            map.fitBounds(bounds);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            })
+            .catch(error => console.error('Error:', error));
+    })
+    .catch(error => console.error('Error:', error));
+
+// Logout button
+document.querySelector('.btn-outline-primary').addEventListener('click', () => {
+    window.location.href = 'http://localhost/S401-site/logout';
+});
+</script>
+
+{% include 'customer/footer.twig' %}

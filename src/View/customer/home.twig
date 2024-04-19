@@ -1,4 +1,4 @@
-{% include 'header.twig' %}
+{% include 'customer/header.twig' %}
 
 <!-- Home page content -->
     <div class="row" style="height: calc(100% - 88px);">
@@ -9,7 +9,7 @@
         <div class="col d-flex justify-content-center mt-5">
             <!-- ... your login form here ... -->
             <div class="col-md-6 custom-border p-5">
-                <form method="POST" action="/S401/login">
+                <form method="POST" action="/S401-site/login">
                     <h2 class="mb-3">Login</h2>
                     <div class="form-group mb-3">
                         <label for="email">Email address</label>
@@ -21,6 +21,9 @@
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary custom-button mt-4">Submit</button>
+                    </div>
+                    <div>
+                        CUSTOMER
                     </div>
                 </form>
             </div>
@@ -98,4 +101,4 @@ fetch('https://api.bigdatacloud.net/data/client-ip')
     .catch(error => console.error('Error:', error));
 </script>
 
-{% include 'footer.twig' %}
+{% include 'customer/footer.twig' %}
